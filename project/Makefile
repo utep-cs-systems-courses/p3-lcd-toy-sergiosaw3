@@ -1,6 +1,6 @@
 # makfile configuration
 
-COMMON_OBJECTS		= draw_shapes.o wdtInterruptHandler.o switches.o led.o
+COMMON_OBJECTS		= draw_shapes.o wdtInterruptHandler.o switches.o led.o p2_c_handler.o p2_asm_handler.o lcddraw.o
 
 CPU             	= msp430g2553
 
