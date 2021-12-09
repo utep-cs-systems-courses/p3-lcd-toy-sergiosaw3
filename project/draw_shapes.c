@@ -2,6 +2,11 @@
 #include "lcdutils.h"
 #include "lcddraw.h"
 #include "draw_shapes.h"
+#include "switches.h"
+#include "buzzer.h"
+
+//#include <libTimer.h>
+//#include "led.h"
 
 // global vars for the rectangle
 rectangle rect1;
@@ -27,6 +32,7 @@ init_shapes(void)
   rect1.width = 10;
   rect1.xvel =-10;
   rect1.yvel =5;
+  rect1.hit =0;
   //rect1.height = 10;
   //rect1.width  = 60;
 
@@ -39,7 +45,7 @@ init_shapes(void)
   rect2.width = 10;
   rect2.xvel =-10;
   rect2.yvel =5;
-  
+  rect2.hit =0;
   
   // vars for the circle
   cir1.cir_y = 60;
@@ -58,15 +64,7 @@ init_shapes(void)
   cir2.old_cir_x = screenWidth / 2;
   cir2.r = 20;
   cir2.xvel =10;
-  cir2.yvel=9;
-  /*
-  tri1.tri_row = 40;
-  tri1.tri_col = screenWidth / 2;
-  tri1.old_tri_row = 40;
-  tri1.old_tri_col = screenWidth / 2;
-  tri1.height = 10;
-  tri1.width = 10;
-  */
+  cir2.yvel=8;
   //if(switch1_state == down){
     
   //}
@@ -109,6 +107,39 @@ int left_col2 = rect2.old_rect_col - (rect2.width / 2);
   //moving_triangle(&tri1);
 }
 
+
+void change_vel1(void)
+{
+  //int tmp;
+  //tmp=cir2.xvel;
+  cir2.xvel = 8;
+  cir2.yvel = 10;
+}
+
+void change_vel2(void)
+{
+  //int tmp;
+  //tmp=cir2.xvel;
+  cir2.xvel = 8;
+  cir2.yvel = -10;
+}
+
+void change_vel3(void)
+{
+  //int tmp;
+  //tmp=cir2.xvel;
+  cir2.xvel = -8;
+  cir2.yvel = 10;
+}
+
+void change_vel4(void)
+{
+  //int tmp;
+  //tmp=cir2.xvel;
+  cir2.xvel = -8;
+  cir2.yvel = -10;
+}
+
 void
 draw_rectangle(void)
 {
@@ -135,7 +166,12 @@ moving_rectangle(rectangle *to_draw)
   unsigned int color = (blue << 11) | (green << 5) | red;
 
   // draw rectangle at current position
+  if(to_draw->hit==0){
   fillRectangle(left_col, top_row, to_draw->width, to_draw->height, color);
+  }
+  else{
+  fillRectangle(left_col, top_row, to_draw->width, to_draw->height, background_color);  
+  }
 
   // save current position
   to_draw->old_rect_row = to_draw->rect_row;
@@ -158,20 +194,24 @@ moving_rectangle(rectangle *to_draw)
     //y_vel = y_vel * -1;
     to_draw->yvel = y_vel*-1;
   }
-  /*
-  if ( ( to_draw->rect_col - (to_draw->width / 2) ) <= cir2.cir_x+cir2.r && (to_draw->rect_row - to_draw->height / 2) <= cir2.cir_y+cir2.r && (to_draw->rect_row + to_draw->height / 2) >= cir2.cir_y+cir2.r &&  to_draw->rect_col + (to_draw->width / 2)  >= cir2.cir_x-cir2.r )
-  {
-    to_draw->xvel=0;
-    to_draw->yvel=0;
-  }*/
   
   /* left of rect <= right of cir AND top of rect >= top of cir *this works because it generates screen top dow* AND bottom of rect <= top of cir??
 */
-  if ( ( to_draw->rect_col - (to_draw->width / 2) ) <= cir2.cir_x+cir2.r && (to_draw->rect_row - to_draw->height / 2) >= cir2.cir_y-cir2.r && (to_draw->rect_row + to_draw->height / 2) <= cir2.cir_y+cir2.r )
+  if ( ( to_draw->rect_col - (to_draw->width / 2) ) <= cir2.cir_x+cir2.r && (to_draw->rect_row - to_draw->height / 2) >= cir2.cir_y-cir2.r && (to_draw->rect_row + to_draw->height / 2) <= cir2.cir_y+cir2.r && to_draw->rect_col + (to_draw->width / 2)  >= cir2.cir_x-cir2.r && to_draw->hit ==0)
     {
+      buzzer_set_period(1000);
       to_draw->xvel=0;
       to_draw->yvel=0;
+      for(int i=0;i<10000;i++){
+	buzzer_set_period(1000);
+      to_draw->xvel=0;
+      to_draw->yvel=0;
+      }
+      //color = background_color;
+      buzzer_set_period(0);
+      to_draw->hit =1;
     }
+  
   
 }
 
@@ -325,4 +365,10 @@ moving_circle(circle *cir)
     // right or left hit, reverse y velocity
     cir->yvel= y_vel*-1;
   }
+
+  if(rect1.hit==1 && rect2.hit==1)
+    {
+      cir->xvel=0;
+      cir->yvel=0;
+    }
 }

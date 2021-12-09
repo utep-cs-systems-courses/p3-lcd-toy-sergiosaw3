@@ -5,6 +5,7 @@
 #include "draw_shapes.h"
 #include "switches.h"
 #include "led.h"
+#include "buzzer.h"
 
 // WARNING: LCD DISPLAY USES P1.0.  Do not touch!!! 
 
@@ -49,25 +50,20 @@ void update_text(void)
   static u_char blue = 31, green = 16, red = 31;
   u_int on_color  =                (green << 5) | red;
   u_int off_color = (blue << 11)                | red;
-  
   if (switch1_state == down) {
-    drawChar5x7(text_col, text_row, '1',on_color, backgroundColor);
-  } else {
-    drawChar5x7(text_col, text_row, '-',off_color, backgroundColor);
+    change_vel1();
+    //buzzer_set_period(1000);
   }
   if (switch2_state == down) {
-    drawChar5x7(text_col + char_width, text_row, '2',on_color, backgroundColor);
-  } else {
-    drawChar5x7(text_col + char_width, text_row, '-',off_color, backgroundColor);
+    change_vel2();
+    //buzzer_set_period(0);
   }
-  
+  if (switch3_state == down) {
+    change_vel3();
+  }
   if (switch4_state == down) {
-    drawChar5x7(text_col + 2*char_width, text_row, '4',on_color, backgroundColor);
-  } else {
-    drawChar5x7(text_col + 2*char_width, text_row, '-',off_color, backgroundColor);
+    change_vel4();
   }
-  
-
 }
 
 void main()
@@ -78,6 +74,7 @@ void main()
   switch_p2_init();     // is a problem, refreshed the screen whenever pressed
   lcd_init();
   led_init();
+  buzzer_init();
   clearScreen(background_color);
 
   init_shapes();
@@ -89,7 +86,7 @@ void main()
   while (1) {			/* forever */
     if (redraw_screen) {
       redraw_screen = 0;
-      //update_text();
+      update_text();
       }
     green_on = 0;   	/* led off */
     led_changed = 1;
