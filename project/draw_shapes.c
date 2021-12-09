@@ -30,7 +30,7 @@ init_shapes(void)
   rect1.old_rect_col = screenWidth / 2;
   rect1.height = 10;
   rect1.width = 10;
-  rect1.xvel =-10;
+  rect1.xvel =10;
   rect1.yvel =5;
   rect1.hit =0;
   //rect1.height = 10;
